@@ -16,13 +16,14 @@ datasource db {
 model Users {
   userId    Int      @id @default(autoincrement()) @map("userId")
   email     String   @unique @map("email")
-  password   String   @map("password")
+  password  String   @map("password")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  usersInfos UsersInfos?
-  posts      Posts[]
-  comments Comments[]
+  usersInfos    UsersInfos?
+  posts         Posts[]
+  comments      Comments[]
+  userHistories UserHistories[] // 사용자(Users) 테이블과 사용자 히스토리(UserHistories) 테이블이 1:N 관계를 맺습니다.
 
   @@map("Users")
 }
@@ -35,10 +36,10 @@ model Posts {
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  comments Comments[]
 
   @@map("Posts")
-  comments Comments[]
 }
 
 model UsersInfos {
@@ -58,17 +59,30 @@ model UsersInfos {
 
 model Comments {
   conmmentId Int      @id @default(autoincrement()) @map("commnetId")
-  userId    Int      @map("userId")
- postId    Int      @map("postId")
+  userId     Int      @map("userId")
+  postId     Int      @map("postId")
   content    String   @map("content")
   createdAt  DateTime @default(now()) @map("createdAt")
   updatedAt  DateTime @updatedAt @map("updatedAt")
 
-  user Users @relation(fields: [userId],references: [userId],onDelete: Cascade)
-  post Posts @relation(fields: [postId],references: [postId],onDelete: Cascade)
-
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
 
   @@map("Comments")
 }
 
+// schema.prisma
 
+model UserHistories {
+  userHistoryId String   @id @default(uuid()) @map("userHistoryId")
+  userId        Int      @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+  changedField  String   @map("changedField") // 변경된 필드명
+  oldValue      String?  @map("oldValue") // 변경 전 값
+  newValue      String   @map("newValue") // 변경 후 값
+  changedAt     DateTime @default(now()) @map("changedAt")
+
+  // Users 테이블과 관계를 설정합니다.
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("UserHistories")
+}
