@@ -56,6 +56,7 @@ router.post("/sign-up", async (req, res, next) => {
   }
 });
 
+//사용자 로그인 API
 router.post("/sign-in", async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -66,12 +67,17 @@ router.post("/sign-in", async (req, res, next) => {
   if (!(await bcrypt.compare(password, user.password)))
     return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
 
-  const token = jwt.sign({ userId: user.userId }, "custom-secret-key");
+  // const token = jwt.sign({ userId: user.userId }, "custom-secret-key"); //JWT할당
+  // res.cookie("authorization", `Bearer ${token}`);
 
-  res.cookie("authorization", `Bearer ${token}`);
+  req.session.userId = user.userId;
+
+
   return res.status(200).json({ message: "로그인에 성공하였습니다." });
 });
 
+
+//사용자 정보 조회 API
 router.get("/users", authMiddleware, async (req, res, next) => {
   const { userId } = req.user;
 
@@ -96,7 +102,7 @@ router.get("/users", authMiddleware, async (req, res, next) => {
 });
 
 
-
+//사용자 정보 변경 API
 router.patch('/users',authMiddleware,async(req,res,next)=>{
   const updatedData = req.body;
   const {userId} = req.user;
