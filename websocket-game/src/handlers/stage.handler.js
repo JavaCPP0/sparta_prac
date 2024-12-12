@@ -27,9 +27,12 @@ export const moveStageHandler = (userId, payload) => {
     return {status:'fail',message:'Invalid elapsed time'};
   }
 
-  //targetStage에 대한 검증 <-게임에셋에 존재하는가?
+  // 게임 에셋에서 스테이지 정보를 가져옴
   const { stages } = getGameAssets();
-  if (!stages.data.come((stage) => stage.id === payload.targetStage)) {
+  // 클라이언트가 요청한 targetStage가 유효한 스테이지인지 검증
+  // some() 메서드를 사용하여 stages.data 배열에서 일치하는 id가 있는지 확인
+  // 참고: come()은 오타로 보이며, some()이 올바른 메서드명입니다
+  if (!stages.data.some((stage) => stage.id === payload.targetStage)) {
     return { status: 'fail', message: 'Target stage not found' };
   }
 
