@@ -13,20 +13,16 @@ export const handleDisconnect = (socket,uuid)=>{
 
 
 export const handleConnection = (socket, userUUID) => {
-    console.log(`New user connected: ${userUUID} with socket ID ${socket.id}`);
-    console.log('Current users:', getUser());
-  
-    // 스테이지 빈 배열 생성
+    console.log(`New user connected: ${userUUID}`);
     createStage(userUUID);
-    
-    socket.emit('connection', { uuid: userUUID });//서버가 클라이언트에게 "연결 완료" 이벤트를 전송합니다.전달된 데이터는 사용자의 UUID입니다.
-  };
+    socket.emit('connection', { uuid: userUUID });
+};
 
 export const handlerEvent =(io,socket,data)=>{//클라이언트로부터 이벤트가 발생할 때 호출되는 함수입니다.
     // 클라이언트 버전을 확인합니다
     // Verify client version
     if(!CLIENT_VERSION.includes(data.clientVersion)){//data.clientVersion이 허용된 버전 목록(CLIENT_VERSION)에 포함되지 않으면 실패 응답을 클라이언트로 보냅니다.
-        socket.emit('reponse',{status:'fail',message: "Client version mismatch"});
+        socket.emit('response',{status:'fail',message: "Client version mismatch"});
         return 
     }
 

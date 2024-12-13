@@ -1,38 +1,39 @@
-// 스테이지 정보를 저장할 객체
+// 게임 스테이지 데이터 관리 모듈
+
+// 사용자별 스테이지 정보 저장소
 const stages = {};
 
 /**
- * 새로운 스테이지를 생성하는 함수
- * @param {string} uuid - 사용자 식별자
+ * 새로운 스테이지 생성
+ * @param {string} uuid - 사용자 ID
  */
 export const createStage = (uuid) => {
-  stages[uuid] = []; // 초기 스테이지 배열 생성
+    stages[uuid] = [];  // 빈 스테이지 배열 초기화
 };
 
 /**
- * 특정 사용자의 스테이지 정보를 조회하는 함수
- * @param {string} uuid - 사용자 식별자
- * @returns {Array} - 스테이지 정보 배열
+ * 스테이지 정보 조회
+ * @param {string} uuid - 사용자 ID
+ * @returns {Array} 스테이지 정보 배열
  */
 export const getStage = (uuid) => {
-  return stages[uuid];
+    return stages[uuid];
 };
 
 /**
- * 스테이지에 새로운 정보를 추가하는 함수
- * @param {string} uuid - 사용자 식별자
+ * 새로운 스테이지 정보 추가
+ * @param {string} uuid - 사용자 ID
  * @param {string} id - 스테이지 ID
- * @param {number} timestamp - 타임스탬프
- * @returns {number} - 추가된 후의 배열 길이
+ * @param {number} timestamp - 시작 시간
  */
 export const setStage = (uuid, id, timestamp) => {
-  return stages[uuid].push({ id, timestamp });
+    return stages[uuid].push({ id, timestamp });
 };
 
 /**
- * 특정 사용자의 스테이지 정보를 초기화하는 함수
- * @param {string} uuid - 사용자 식별자
+ * 스테이지 정보 초기화
+ * @param {string} uuid - 사용자 ID
  */
 export const clearStage = (uuid) => {
-  stages[uuid] = [];
+    stages[uuid] = [];
 };
