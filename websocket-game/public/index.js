@@ -35,13 +35,34 @@ const CACTI_CONFIG = [
   { width: 68 / 1.5, height: 70 / 1.5, image: 'images/cactus_3.png' },
 ];
 
-// 아이템
+// item.json과 item_unlock.json 데이터를 먼저 로드
+let itemData = null;
+let itemUnlockData = null;
+
+async function loadItemData() {
+  try {
+    const itemResponse = await fetch('/assets/item.json');
+    const itemUnlockResponse = await fetch('/assets/item_unlock.json');
+    
+    itemData = await itemResponse.json();
+    itemUnlockData = await itemUnlockResponse.json();
+  } catch (error) {
+    console.error('아이템 데이터 로딩 실패:', error);
+    // 에러 발생시 기본값 설정
+    itemData = { data: [] };
+    itemUnlockData = { data: [] };
+  }
+}
+
+// ITEM_CONFIG를 item.json 기반으로 수정
 const ITEM_CONFIG = [
   { width: 50 / 1.5, height: 50 / 1.5, id: 1, image: 'images/items/pokeball_red.png' },
   { width: 50 / 1.5, height: 50 / 1.5, id: 2, image: 'images/items/pokeball_yellow.png' },
   { width: 50 / 1.5, height: 50 / 1.5, id: 3, image: 'images/items/pokeball_purple.png' },
   { width: 50 / 1.5, height: 50 / 1.5, id: 4, image: 'images/items/pokeball_cyan.png' },
-  { width: 50 / 1.5, height: 50 / 1.5, id: 5, image: 'images/items/bomb.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 5, image: 'images/items/pokeball_pink.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 6, image: 'images/items/pokeball_orange.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 7, image: 'images/items/bomb.png' },
 ];
 
 // 게임 요소들
@@ -58,7 +79,11 @@ let gameover = false;
 let hasAddedEventListenersForRestart = false;
 let waitingToStart = true;
 
-function createSprites() {
+async function createSprites() {
+  // 아이템 데이터 로드가 안되어있으면 로드
+  if (!itemData || !itemUnlockData) {
+    await loadItemData();
+  }
   // 비율에 맞는 크기
   // 유저
   const playerWidthInGame = PLAYER_WIDTH * scaleRatio;
@@ -69,6 +94,30 @@ function createSprites() {
   // 땅
   const groundWidthInGame = GROUND_WIDTH * scaleRatio;
   const groundHeightInGame = GROUND_HEIGHT * scaleRatio;
+
+  const itemImages = ITEM_CONFIG.map((item) => {
+    const image = new Image();
+    image.src = item.image;
+    const itemInfo = itemData.data.find(i => i.id === item.id);
+    return {
+      image,
+      id: item.id,
+      width: item.width * scaleRatio,
+      height: item.height * scaleRatio,
+      isBomb: itemInfo ? itemInfo.isBomb : false,
+      score: itemInfo ? itemInfo.score : 0
+    };
+  });
+
+  itemController = new ItemController(
+    ctx, 
+    itemImages, 
+    scaleRatio, 
+    GROUND_SPEED,
+    itemUnlockData.data
+  );
+
+  score = new Score(ctx, scaleRatio, itemController);
 
   player = new Player(
     ctx,
@@ -92,21 +141,6 @@ function createSprites() {
   });
 
   cactiController = new CactiController(ctx, cactiImages, scaleRatio, GROUND_SPEED);
-
-  const itemImages = ITEM_CONFIG.map((item) => {
-    const image = new Image();
-    image.src = item.image;
-    return {
-      image,
-      id: item.id,
-      width: item.width * scaleRatio,
-      height: item.height * scaleRatio,
-    };
-  });
-
-  itemController = new ItemController(ctx, itemImages, scaleRatio, GROUND_SPEED);
-
-  score = new Score(ctx, scaleRatio);
 }
 
 function getScaleRatio() {
@@ -121,19 +155,42 @@ function getScaleRatio() {
   }
 }
 
-function setScreen() {
+// setScreen() 함수를 async로 변경
+async function setScreen() {
   scaleRatio = getScaleRatio();
   canvas.width = GAME_WIDTH * scaleRatio;
   canvas.height = GAME_HEIGHT * scaleRatio;
-  createSprites();
+  await createSprites();
 }
 
-setScreen();
-window.addEventListener('resize', setScreen);
+// 게임 시작 시 비동기로 실행
+async function startGame() {
+  await setScreen();  // createSprites() 호출 포함
+  
+  window.addEventListener('resize', setScreen);
 
-if (screen.orientation) {
-  screen.orientation.addEventListener('change', setScreen);
+  if (screen.orientation) {
+    screen.orientation.addEventListener('change', setScreen);
+  }
+
+  // 게임 오브젝트들이 모두 생성된 후에 이벤트 리스너 추가
+  window.addEventListener('keydown', (event) => {
+    if (event.code === 'Space' && waitingToStart) {
+      reset();
+    }
+  });
+
+  // 모바일을 위한 터치 이벤트도 추가
+  window.addEventListener('touchstart', () => {
+    if (waitingToStart) {
+      reset();
+    }
+  });
+  
+  requestAnimationFrame(gameLoop);
 }
+
+startGame();
 
 function showGameOver() {
   const fontSize = 70 * scaleRatio;
@@ -164,8 +221,10 @@ function reset() {
 
   ground.reset();
   cactiController.reset();
+  itemController.reset();
   score.reset();
   gameSpeed = GAME_SPEED_START;
+  
   // 게임시작 핸들러ID 2, payload 에는 게임 시작 시간
   sendEvent(2, { timestamp: Date.now() });
 }
@@ -244,5 +303,3 @@ function gameLoop(currentTime) {
 
 // 게임 프레임을 다시 그리는 메서드
 requestAnimationFrame(gameLoop);
-
-window.addEventListener('keyup', reset, { once: true });

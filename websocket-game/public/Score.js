@@ -1,4 +1,5 @@
 import { sendEvent } from './Socket0.js';
+import ItemController from './ItemController.js';
 
 class Score {
   score = 0;
@@ -8,46 +9,33 @@ class Score {
   nextStageScore = 100;
   scoreMultiplier = 1;
 
-  constructor(ctx, scaleRatio) {
+  constructor(ctx, scaleRatio, itemController) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
     this.scaleRatio = scaleRatio;
+    this.itemController = itemController;
   }
 
   update(deltaTime) {
-    this.score += (deltaTime * 0.001) * this.scoreMultiplier;
+    this.score += deltaTime * 0.001 * this.scoreMultiplier;
     if (Math.floor(this.score) >= this.nextStageScore && this.stageChange) {
       this.stageChange = false;
       this.currentStage++;
       this.nextStageScore *= 2;
       this.scoreMultiplier += 0.5;
-      sendEvent(11, { 
-        currentStage: this.currentStage - 1, 
-        targetStage: this.currentStage 
+      this.itemController.updateStage(this.currentStage);
+      sendEvent(11, {
+        currentStage: this.currentStage - 1,
+        targetStage: this.currentStage,
       });
     }
   }
 
+  // Score.js의 getItem 메서드 수정
   getItem(itemId) {
-    // 아이템 획득시 점수 변화
-    switch(itemId) {
-      case 1:
-        this.score += 10;
-        break;
-      case 2:
-        this.score += 20;
-        break;
-      case 3:
-        this.score += 30;
-        break;
-      case 4:
-        this.score += 40;
-        break;
-      case 5: // 폭탄
-        this.score = Math.max(0, this.score - 50); // 폭탄은 점수를 감소시키되 0 밑으로는 안내려감
-        break;
-      default:
-        this.score += 0;
+    const collidedItem = this.itemController.items.find((item) => item.id === itemId);
+    if (collidedItem) {
+      this.score = Math.max(0, this.score + collidedItem.score); // 점수가 0 미만이 되지 않도록
     }
   }
 

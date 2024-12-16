@@ -9,6 +9,7 @@ const server = createServer(app);    // HTTP 서버 생성 (WebSocket 지원용)
 const PORT = 3000;
 
 // 미들웨어 설정
+app.use('/assets', express.static('assets'));
 app.use(express.static('public'));   // 정적 파일 서비스
 app.use(express.json());            // JSON 파싱
 app.use(express.urlencoded({ extended: false }));

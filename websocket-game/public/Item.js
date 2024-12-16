@@ -1,6 +1,6 @@
 class Item {
     // 아이템 초기화
-    constructor(ctx, id, x, y, width, height, image) {
+    constructor(ctx, id, x, y, width, height, image, score, isBomb) {
         this.ctx = ctx;         // 캔버스 컨텍스트
         this.id = id;           // 아이템 고유 ID
         this.x = x;             // x 좌표
@@ -8,6 +8,8 @@ class Item {
         this.width = width;     // 너비
         this.height = height;   // 높이
         this.image = image;     // 아이템 이미지
+        this.score = score;     // 아이템 점수
+        this.isBomb = isBomb;   // 아이템 폭탄 여부
     }
 
     // 아이템 위치 업데이트

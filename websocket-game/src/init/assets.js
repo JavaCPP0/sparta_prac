@@ -51,7 +51,7 @@ export const loadGameAssets = async () =>{
 
 /**
  * 현재 로드된 게임 에셋을 반환하는 함수
- * @returns {Object} 현재 로드된 게임 에셋 객체
+ * @returns {gameAssets} 현재 로드된 게임 에셋 객체
  */
 export const getGameAssets = () => {
   return gameAssets;

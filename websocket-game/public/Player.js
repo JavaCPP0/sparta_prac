@@ -1,17 +1,15 @@
 class Player {
-    // 걷기 애니메이션 관련 상수 및 변수
-    WALK_ANIMATION_TIMER = 200;  // 애니메이션 프레임 전환 시간 (ms)
+    WALK_ANIMATION_TIMER = 200;
     walkAnimationTimer = this.WALK_ANIMATION_TIMER;
-    dinoRunImages = [];  // 달리기 애니메이션 이미지 배열
+    dinoRunImages = [];
 
-    // 점프 관련 상태 변수
-    jumpPressed = false;     // 점프 키가 눌렸는지 여부
-    jumpInProgress = false;  // 점프가 진행 중인지 여부
-    falling = false;         // 낙하 중인지 여부
+    //점프 상태값
+    jumpPressed = false;
+    jumpInProgress = false;
+    falling = false;
 
-    // 물리 상수
-    JUMP_SPEED = 0.6;  // 점프 속도
-    GRAVITY = 0.4;     // 중력 가속도
+    JUMP_SPEED = 0.6;
+    GRAVITY = 0.4;
 
     // 생성자
     constructor(ctx, width, height, minJumpHeight, maxJumpHeight, scaleRatio) {
@@ -51,21 +49,18 @@ class Player {
         window.addEventListener("keyup", this.keyup);
     }
 
-    // 키보드 이벤트 핸들러 - 스페이스바 누를 때
     keydown = (event) => {
         if (event.code === "Space") {
             this.jumpPressed = true;
         }
     };
 
-    // 키보드 이벤트 핸들러 - 스페이스바 뗄 때
     keyup = (event) => {
         if (event.code === "Space") {
             this.jumpPressed = false;
         }
     };
 
-    // 게임 상태 업데이트 메서드
     update(gameSpeed, deltaTime) {
         this.run(gameSpeed, deltaTime);
 
@@ -76,41 +71,37 @@ class Player {
         this.jump(deltaTime);
     }
 
-    // 점프 로직 처리 메서드
     jump(deltaTime) {
         if (this.jumpPressed) {
             this.jumpInProgress = true;
         }
 
-        // 상승 단계
+        // 점프가 진행중이고 떨어지는중이 아닐때
         if (this.jumpInProgress && !this.falling) {
-            // 최소 점프 높이에 도달하지 않았거나
-            // 최대 점프 높이에 도달하지 않고 점프 키를 계속 누르고 있는 경우
+            // 현재 인스턴스의 위치가 점프의 최소, 최대값의 사이일때
             if ((this.y > this.canvas.height - this.minJumpHeight) ||
                 (this.y > this.canvas.height - this.maxJumpHeight) && this.jumpPressed) {
+                // 아무튼 위의 내용은 버튼을 눌렀을때 올라가는 조건
                 this.y -= this.JUMP_SPEED * deltaTime * this.scaleRatio;
             } else {
                 this.falling = true;
             }
-        } 
-        // 하강 단계
-        else {
+            // 떨어질 때
+        } else {
             if (this.y < this.yStandingPosition) {
                 this.y += this.GRAVITY * deltaTime * this.scaleRatio;
 
-                // 착지 위치 보정
+                // 혹시 위치가 어긋 났을때 원래 위치로
                 if (this.y + this.height > this.canvas.height) {
                     this.y = this.yStandingPosition
                 }
             } else {
-                // 착지 완료
                 this.falling = false;
                 this.jumpInProgress = false;
             }
         }
     }
 
-    // 달리기 애니메이션 처리 메서드
     run(gameSpeed, deltaTime) {
         if (this.walkAnimationTimer <= 0) {
             if (this.image === this.dinoRunImages[0]) {
@@ -124,7 +115,6 @@ class Player {
         this.walkAnimationTimer -= deltaTime * gameSpeed;
     }
 
-    // 캐릭터 그리기 메서드
     draw() {
         this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
