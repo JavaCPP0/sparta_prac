@@ -9,7 +9,7 @@ class ItemController {
   nextInterval = null;
   items = [];
   itemCollectionTimes = []; // 아이템 획득 시간을 기록할 배열
-  ABUSE_TIME_WINDOW = 12500; // 어뷰징 검사 시간 윈도우 (12.5초)
+  ABUSE_TIME_WINDOW = 9000; // 어뷰징 검사 시간 윈도우 (12.5초)
   ABUSE_ITEM_THRESHOLD = 2; // 시간 윈도우 내 허용되는 최대 아이템 수
   currentStage = 1000; // 현재 스테이지 정보 추가
   itemUnlockData = []; // itemUnlockData 저장
@@ -145,7 +145,7 @@ class ItemController {
     );
 
     // 현재 시간 윈도우 내의 아이템 획득 횟수가 임계값을 초과하면 어뷰징으로 판단
-    return this.itemCollectionTimes.length >= this.ABUSE_ITEM_THRESHOLD;
+    return this.itemCollectionTimes.length > this.ABUSE_ITEM_THRESHOLD;
   }
 
   // 스테이지 정보를 업데이트하는 메서드 추가

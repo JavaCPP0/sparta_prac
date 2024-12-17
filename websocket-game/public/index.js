@@ -41,11 +41,18 @@ let itemUnlockData = null;
 
 async function loadItemData() {
   try {
+    console.log('Starting to load item data...');
     const itemResponse = await fetch('/assets/item.json');
     const itemUnlockResponse = await fetch('/assets/item_unlock.json');
     
+    console.log('Item Response:', itemResponse);
+    console.log('Item Unlock Response:', itemUnlockResponse);
+    
     itemData = await itemResponse.json();
     itemUnlockData = await itemUnlockResponse.json();
+    
+    console.log('Loaded Item Data:', itemData);
+    console.log('Loaded Item Unlock Data:', itemUnlockData);
   } catch (error) {
     console.error('아이템 데이터 로딩 실패:', error);
     // 에러 발생시 기본값 설정
@@ -80,10 +87,16 @@ let hasAddedEventListenersForRestart = false;
 let waitingToStart = true;
 
 async function createSprites() {
+  console.log('Creating sprites...');
   // 아이템 데이터 로드가 안되어있으면 로드
   if (!itemData || !itemUnlockData) {
+    console.log('Loading item data...');
     await loadItemData();
   }
+  
+  console.log('Item Data after load:', itemData);
+  console.log('Item Unlock Data after load:', itemUnlockData);
+  
   // 비율에 맞는 크기
   // 유저
   const playerWidthInGame = PLAYER_WIDTH * scaleRatio;
@@ -95,6 +108,7 @@ async function createSprites() {
   const groundWidthInGame = GROUND_WIDTH * scaleRatio;
   const groundHeightInGame = GROUND_HEIGHT * scaleRatio;
 
+  // 아이템 이미지 설정
   const itemImages = ITEM_CONFIG.map((item) => {
     const image = new Image();
     image.src = item.image;
@@ -109,6 +123,15 @@ async function createSprites() {
     };
   });
 
+  // 순서 중요: ItemController를 먼저 생성
+  console.log('ItemController being created with:', {
+    ctx,
+    itemImages,
+    scaleRatio,
+    GROUND_SPEED,
+    itemUnlockData: itemUnlockData.data
+  });
+  
   itemController = new ItemController(
     ctx, 
     itemImages, 
@@ -116,19 +139,23 @@ async function createSprites() {
     GROUND_SPEED,
     itemUnlockData.data
   );
+  
+  console.log('ItemController created:', itemController);
 
+  // Score는 ItemController 다음에 생성
   score = new Score(ctx, scaleRatio, itemController);
 
+  // 나머지 객체들 생성
+  ground = new Ground(ctx, groundWidthInGame, groundHeightInGame, GROUND_SPEED, scaleRatio);
+  
   player = new Player(
     ctx,
     playerWidthInGame,
     playerHeightInGame,
     minJumpHeightInGame,
     maxJumpHeightInGame,
-    scaleRatio,
+    scaleRatio
   );
-
-  ground = new Ground(ctx, groundWidthInGame, groundHeightInGame, GROUND_SPEED, scaleRatio);
 
   const cactiImages = CACTI_CONFIG.map((cactus) => {
     const image = new Image();
