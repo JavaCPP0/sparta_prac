@@ -71,8 +71,6 @@ class Score {
       });
     }
 
-    // 현재 점수가 최고 점수를 넘었는지 주기적으로 체크
-    this.checkHighScore();
     
     // 매 프레임마다 점수 표시 업데이트
     this.draw();
