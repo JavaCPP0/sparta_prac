@@ -78,6 +78,7 @@ class CactiController {
     }
 
     collideWith(sprite) {
+        //console.log('collideWith called with sprite:', this.cacti.some(cactus => cactus.collideWith(sprite)));
         return this.cacti.some(cactus => cactus.collideWith(sprite));
     }
 

@@ -16,6 +16,11 @@ socket.on('connection', (data) => {
   userId = data.uuid;
 });
 
+socket.on('globalHighScore', (data) => {
+  console.log('Global high score updated:', data);
+  // You can trigger a UI update here if needed
+});
+
 const sendEvent = (handlerId, payload) => {
   socket.emit('event', {
     userId,
@@ -25,4 +30,4 @@ const sendEvent = (handlerId, payload) => {
   });
 };
 
-export { sendEvent };
+export { sendEvent, socket };

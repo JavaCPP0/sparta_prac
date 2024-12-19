@@ -14,7 +14,8 @@ app.use(express.static('public'));   // 정적 파일 서비스
 app.use(express.json());            // JSON 파싱
 app.use(express.urlencoded({ extended: false }));
 
-// WebSocket 초기화
+let numUsers = 0;
+
 initSocket(server);
 
 // 기본 라우트
