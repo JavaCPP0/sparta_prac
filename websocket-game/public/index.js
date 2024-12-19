@@ -280,6 +280,12 @@ function gameLoop(currentTime) {
     gameover = true;
     score.setHighScore();
     setupGameReset();
+    
+    // 게임 종료 이벤트 전송 (handlerId: 3)
+    sendEvent(3, {
+        timestamp: Date.now(),
+        score: score.getScore()
+    });
   }
   const collideWithItem = itemController.collideWith(player);
   if (collideWithItem && collideWithItem.itemId) {

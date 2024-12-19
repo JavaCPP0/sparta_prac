@@ -22,19 +22,26 @@ const handleHighScore = async (userId, payload) => {
 
         // 새로운 점수가 전체 최고 점수보다 높은 경우 업데이트
         if (score > globalHighScore) {
-            // Redis에 새로운 최고 점수 저장
-            await redis.set(GLOBAL_HIGH_SCORE_KEY, score);
-            // 사용자의 최고 점수도 저장
-            await redis.set(`${USER_HIGH_SCORE_PREFIX}${userId}`, score);
-            userHighScores.set(userId, score);
+            console.log(`New high score achieved:`, {
+                userId,
+                newScore: score,
+                previousScore: globalHighScore
+            });
 
-            // 브로드캐스트로 모든 클라이언트에게 새로운 최고 점수 전달
+            // Redis 업데이트
+            await Promise.all([
+                redis.set(GLOBAL_HIGH_SCORE_KEY, score),
+                redis.set(`${USER_HIGH_SCORE_PREFIX}${userId}`, score)
+            ]);
+            
+            // 브로드캐스트를 위한 응답 설정
             return {
                 status: 'success',
-                broadcast: true,
-                event: 'globalHighScore',
+                broadcast: true,  // 브로드캐스트 필요
+                event: 'globalHighScore',  // 브로드캐스트 이벤트 이름
                 data: { 
-                    score: score 
+                    score: score,
+                    achievedBy: userId
                 }
             };
         }

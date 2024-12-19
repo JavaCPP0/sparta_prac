@@ -37,6 +37,7 @@ class Score {
         console.log('Updating high score from response:', response.data.score);
         this.globalHighScore = response.data.score;
         this.highScoreUpdated = true;
+        this.draw();
       }
     });
 
@@ -47,6 +48,7 @@ class Score {
         console.log('Updating high score from broadcast:', data.score);
         this.globalHighScore = data.score;
         this.highScoreUpdated = true;
+        this.draw();
       }
     });
   }
@@ -71,6 +73,9 @@ class Score {
 
     // 현재 점수가 최고 점수를 넘었는지 주기적으로 체크
     this.checkHighScore();
+    
+    // 매 프레임마다 점수 표시 업데이트
+    this.draw();
   }
 
   checkHighScore() {
@@ -82,10 +87,10 @@ class Score {
 
   setHighScore() {
     const currentScore = Math.floor(this.score);
-    if (currentScore > this.globalHighScore) {
-      console.log('Sending new high score:', currentScore);
-      sendEvent(12, { score: currentScore });
-    }
+    
+    // 서버에 새로운 점수 전송 (handlerId: 12)
+    console.log('Sending score to server:', currentScore);
+    sendEvent(12, { score: currentScore });
   }
 
   getItem(itemId) {

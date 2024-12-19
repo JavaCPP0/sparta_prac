@@ -19,7 +19,7 @@ const registerHandler = (io) => {
         socket.on('event', (data) => handlerEvent(io, socket, data));
         
         // 연결 해제 핸들러 등록
-        socket.on('disconnect', (socket) => handleDisconnect(socket, userUUID));
+        socket.on('disconnect', () => handleDisconnect(socket, userUUID));
     })
 }
 

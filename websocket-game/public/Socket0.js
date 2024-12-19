@@ -17,8 +17,12 @@ socket.on('connection', (data) => {
 });
 
 socket.on('globalHighScore', (data) => {
-  console.log('Global high score updated:', data);
-  // You can trigger a UI update here if needed
+  const timestamp = new Date().toLocaleTimeString();
+  console.log(`[${timestamp}] Global high score broadcast received:`, {
+    score: data.score,
+    previousScore: window.lastHighScore || 0
+  });
+  window.lastHighScore = data.score;  // 이전 점수 저장
 });
 
 const sendEvent = (handlerId, payload) => {
