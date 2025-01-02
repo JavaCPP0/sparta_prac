@@ -4,8 +4,10 @@ import { createServer } from 'http';
 import initSocket from './init/socket.js';
 import { loadGameAssets } from './init/assets.js';
 
+
 const app = express();
 const server = createServer(app);    // HTTP 서버 생성 (WebSocket 지원용)
+const redis = require('socket.io-redis');
 const PORT = 3000;
 
 // 미들웨어 설정
@@ -16,6 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 
 let numUsers = 0;
 
+io.adapter(redis({ host: 'localhost', port: 6379 }));
+// WebSocket 초기화
 initSocket(server);
 
 // 기본 라우트
