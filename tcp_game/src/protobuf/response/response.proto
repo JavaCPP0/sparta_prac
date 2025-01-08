@@ -3,7 +3,7 @@ syntax = "proto3";
 package response;
 
 message Response{
-    uint32 handlerid = 1;
+    uint32 handlerId = 1;
     uint32 responseCode =2;
     int64 timestamp =3;
     bytes data=4;

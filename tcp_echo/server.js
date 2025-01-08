@@ -35,8 +35,12 @@ const server = net.createServer((socket) => {
 
     console.log(`client 에게 받은 메세지:${message}`);
 
-    const responseMessage = handler(message);
-    const responseBuffer =Buffer.from(responseMessage);
+    switch (handlerId){
+      case 10:
+        const responseMessage = handler(message);
+        const responseBuffer =Buffer.from(responseMessage);
+        break;
+    }
 
     const header = writeHeader(responseBuffer.length,handlerId);
     const packet = Buffer.concat([header,responseBuffer]);
