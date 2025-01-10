@@ -1,7 +1,8 @@
-export const RESPONSE_SUCCESS_CODE =0;
-
+export const RESPONSE_SUCCESS_CODE = 0;
 
 export const HANDLER_IDS = {
-    INITIAL: 1,
-    // 다른 핸들러 ID 추가
+  INITIAL: 0,
+  CREATE_GAME: 4,
+  JOIN_GAME: 5,
+  UPDATE_LOCATION: 6,
 };
